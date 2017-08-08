@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/vertx3-chat-example.iml" filepath="$PROJECT_DIR$/vertx3-chat-example.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/vertx3-chat-example_main.iml" filepath="$PROJECT_DIR$/.idea/modules/vertx3-chat-example_main.iml" group="vertx3-chat-example" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/vertx3-chat-example_test.iml" filepath="$PROJECT_DIR$/.idea/modules/vertx3-chat-example_test.iml" group="vertx3-chat-example" />
+    </modules>
+  </component>
+</project>

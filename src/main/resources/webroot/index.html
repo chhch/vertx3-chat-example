@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="de">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Chat</title>
+
+  <!-- Bootstrap -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+  <!-- Optional theme -->
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap-theme.min.css">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.4.0/css/font-awesome.min.css">
+
+  <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+  <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+  <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.2/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+    <link rel="stylesheet" href="css/main.css" media="screen" charset="utf-8">
+</head>
+
+<body style="padding-top: 40px;">
+  <div class="container">
+    <div class="panel panel-default center-block loginPanel">
+      <div class="panel-heading">
+        <h1><i class="fa fa-comments"></i> Chat
+          <small>Anmeldung</small>
+        </h1>
+      </div>
+      <div class="panel-body">
+        <form action="/loginhandler" method="post">
+          <div class="form-group">
+            <label for="username" class="sr-only">Benutzername</label>
+            <div class="input-group">
+              <span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span>
+              <input type="text" class="form-control" id="username" name="username" placeholder="Benutzername" required autofocus>
+            </div>
+          </div>
+          <div class="form-group">
+            <label for="password" class="sr-only">Passwort</label>
+            <div class="input-group">
+              <span class="input-group-addon"><i class="fa fa-lock fa-fw"></i></span>
+              <input type="password" class="form-control" id="password" name="password" placeholder="Passwort" required>
+            </div>
+          </div>
+          <button type="submit" class="btn btn-primary btn-lg btn-block">
+            Anmelden
+          </button>
+          </form>
+      </div>
+      <div class="panel-footer">
+        <p class="help-block text-center">Du hast noch kein Benutzerkonto erstellt? Hier geht's zur <a href="/registration.html" role="button">Registrierung</a>.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
+  <!--<script src="libaries/jquery.min.js"></script>-->
+  <!-- Include all compiled plugins (below), or include individual files as needed -->
+  <!--<script src="libaries/bootstrap.min.js"></script>-->
+
+  <script data-main="js/chat" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.20/require.min.js"></script>
+</body>
+
+</html>
