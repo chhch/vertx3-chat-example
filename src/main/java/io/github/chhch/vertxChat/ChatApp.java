@@ -7,25 +7,20 @@ import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.embeddedmongo.EmbeddedMongoVerticle;
-import io.vertx.ext.mongo.MongoClient;
 
 /**
  * Created by ch on 31.08.2015.
  */
 public class ChatApp {
-    private final static boolean USE_EMBEDDED_MONGO_DB = false;
+    private static final boolean USE_EMBEDDED_MONGO_DB = false;
+    private static final int EMBEDDED_MONGO_DB_PORT = 27017;
 
     public static void main(String[] args) {
         Vertx vertx = Vertx.vertx();
-        // To stop the MongoDB-Server after terminating the program, type in the console/terminal:
-        // 1) mongo
-        // 2) use admin
-        // 3) db.shutdownServer()
         if (USE_EMBEDDED_MONGO_DB) {
             startEmbeddedMongoDB(vertx);
         } else {
             deployVerticles(vertx);
-//            testMongoDb(vertx);
         }
     }
 
@@ -35,12 +30,12 @@ public class ChatApp {
         final Vertx vertxOpt = Vertx.vertx(vertxOptions);
 
         // a port number is needed by EmbeddedMongoVerticle
-        DeploymentOptions mongoOptions = new DeploymentOptions().setWorker(true).setConfig(new JsonObject().put("port", 27017));
+        DeploymentOptions mongoOptions = new DeploymentOptions().setWorker(true)
+                .setConfig(new JsonObject().put("port", EMBEDDED_MONGO_DB_PORT));
         vertx.deployVerticle(new EmbeddedMongoVerticle(), mongoOptions, res -> {
             if (res.succeeded()) {
                 System.out.println("Embedded MongoDB Verticle successfully deployed");
                 deployVerticles(vertx);
-                testMongoDb(vertxOpt);
             } else {
                 System.out.println("ERROR: Embedded MongoDB Verticle deployment failed!");
             }
@@ -58,23 +53,10 @@ public class ChatApp {
 
         vertx.deployVerticle(new WebsiteVerticle(), completionHandler -> {
             if (completionHandler.succeeded()) {
-                System.out.println("WebsiteVerticle successfully deployed");
+                System.out.println("WebsiteVerticle successfully deployed," +
+                        " visit: http://localhost:8080");
             } else {
                 System.out.println("ERROR: WebsiteVerticle deployment failed!");
-            }
-        });
-    }
-
-    private static void testMongoDb(Vertx vertx) {
-        MongoClient mongoService = MongoClient.createNonShared(vertx, new JsonObject());
-        JsonObject document = new JsonObject().put("_key", "_value");
-
-        mongoService.save("__test", document, result -> {
-            if (result.succeeded()) {
-                System.out.println("MongoDB is running");
-            } else {
-                System.out.println("MongoDB isn't running");
-                result.cause().printStackTrace();
             }
         });
     }
