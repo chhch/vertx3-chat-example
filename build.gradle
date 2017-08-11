@@ -41,7 +41,7 @@ dependencies {
 shadowJar {
     classifier = 'fat'
     manifest {
-        attributes 'Main-Class': 'de.hbrs.vertxChat.ChatApp'
+        attributes 'Main-Class': 'io.github.chhch.ChatApp'
     }
     mergeServiceFiles {
         include 'META-INF/services/io.vertx.core.spi.VerticleFactory'

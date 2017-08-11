@@ -1,7 +1,7 @@
-package de.hbrs.vertxChat;
+package io.github.chhch.vertxChat;
 
-import de.hbrs.vertxChat.verticles.chat.ChatVerticle;
-import de.hbrs.vertxChat.verticles.website.WebsiteVerticle;
+import io.github.chhch.vertxChat.verticles.chat.ChatVerticle;
+import io.github.chhch.vertxChat.verticles.website.WebsiteVerticle;
 import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;

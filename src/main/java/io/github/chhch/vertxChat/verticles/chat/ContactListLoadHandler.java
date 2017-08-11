@@ -1,7 +1,7 @@
-package de.hbrs.vertxChat.verticles.chat;
+package io.github.chhch.vertxChat.verticles.chat;
 
-import de.hbrs.vertxChat.persistence.DbOperation;
-import de.hbrs.vertxChat.verticles.enums.JsonKeys;
+import io.github.chhch.vertxChat.persistence.DbOperation;
+import io.github.chhch.vertxChat.verticles.enums.JsonKeys;
 import io.vertx.core.Handler;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.eventbus.Message;

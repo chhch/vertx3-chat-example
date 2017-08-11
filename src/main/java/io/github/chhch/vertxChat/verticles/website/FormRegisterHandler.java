@@ -1,4 +1,4 @@
-package de.hbrs.vertxChat.verticles.website;
+package io.github.chhch.vertxChat.verticles.website;
 
 import io.vertx.core.Handler;
 import io.vertx.core.MultiMap;

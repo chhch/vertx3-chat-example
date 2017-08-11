@@ -1,6 +1,6 @@
-package de.hbrs.vertxChat.verticles.website;
+package io.github.chhch.vertxChat.verticles.website;
 
-import de.hbrs.vertxChat.verticles.enums.EventBusAddresses;
+import io.github.chhch.vertxChat.verticles.enums.EventBusAddresses;
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.auth.mongo.MongoAuth;
@@ -19,7 +19,7 @@ import java.util.List;
 
 /**
  * Manages the website access.
- *
+ * <p>
  * Created by ch on 31.08.2015.
  */
 public class WebsiteVerticle extends AbstractVerticle {

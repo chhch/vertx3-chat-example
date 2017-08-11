@@ -1,4 +1,4 @@
-package de.hbrs.vertxChat.verticles.enums;
+package io.github.chhch.vertxChat.verticles.enums;
 
 /**
  * Created by ch on 07.09.2015.

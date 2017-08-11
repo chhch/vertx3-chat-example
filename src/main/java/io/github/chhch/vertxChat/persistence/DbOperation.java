@@ -1,4 +1,4 @@
-package de.hbrs.vertxChat.persistence;
+package io.github.chhch.vertxChat.persistence;
 
 import io.vertx.core.AsyncResult;
 import io.vertx.core.Handler;

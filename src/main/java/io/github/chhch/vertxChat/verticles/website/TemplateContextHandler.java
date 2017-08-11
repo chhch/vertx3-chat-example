@@ -1,7 +1,7 @@
-package de.hbrs.vertxChat.verticles.website;
+package io.github.chhch.vertxChat.verticles.website;
 
-import de.hbrs.vertxChat.verticles.enums.EventBusAddresses;
-import de.hbrs.vertxChat.verticles.enums.JsonKeys;
+import io.github.chhch.vertxChat.verticles.enums.EventBusAddresses;
+import io.github.chhch.vertxChat.verticles.enums.JsonKeys;
 import io.vertx.core.Handler;
 import io.vertx.core.eventbus.DeliveryOptions;
 import io.vertx.core.eventbus.EventBus;

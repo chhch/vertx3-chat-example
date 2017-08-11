@@ -1,4 +1,4 @@
-package de.hbrs.vertxChat.verticles.enums;
+package io.github.chhch.vertxChat.verticles.enums;
 
 /**
  * Contains the addresses, which client and server use.
