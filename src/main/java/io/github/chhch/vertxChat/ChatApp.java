@@ -2,9 +2,7 @@ package io.github.chhch.vertxChat;
 
 import io.github.chhch.vertxChat.verticles.chat.ChatVerticle;
 import io.github.chhch.vertxChat.verticles.website.WebsiteVerticle;
-import io.vertx.core.DeploymentOptions;
-import io.vertx.core.Vertx;
-import io.vertx.core.VertxOptions;
+import io.vertx.core.*;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.embeddedmongo.EmbeddedMongoVerticle;
 
@@ -14,50 +12,62 @@ import io.vertx.ext.embeddedmongo.EmbeddedMongoVerticle;
 public class ChatApp {
     private static final boolean USE_EMBEDDED_MONGO_DB = false;
     private static final int EMBEDDED_MONGO_DB_PORT = 27017;
+    private static Vertx vertx;
 
     public static void main(String[] args) {
-        Vertx vertx = Vertx.vertx();
+        vertx = Vertx.vertx();
+
+        Future<String> embeddedMongo = Future.future();
+        Future<String> chat = Future.future();
+        Future<String> web = Future.future();
+
         if (USE_EMBEDDED_MONGO_DB) {
-            startEmbeddedMongoDB(vertx);
+            deployEmbeddedMongoDB(embeddedMongo);
         } else {
-            deployVerticles(vertx);
+            embeddedMongo.fail("use another one");
         }
-    }
 
-    private static void startEmbeddedMongoDB(final Vertx vertx) {
-        // The MongoDB download need some time. After that, any further start will be much faster
-        VertxOptions vertxOptions = new VertxOptions().setMaxWorkerExecuteTime(30 * 60 * 1000);
-        final Vertx vertxOpt = Vertx.vertx(vertxOptions);
-
-        // a port number is needed by EmbeddedMongoVerticle
-        DeploymentOptions mongoOptions = new DeploymentOptions().setWorker(true)
-                .setConfig(new JsonObject().put("port", EMBEDDED_MONGO_DB_PORT));
-        vertx.deployVerticle(new EmbeddedMongoVerticle(), mongoOptions, res -> {
+        embeddedMongo.setHandler(res -> {
             if (res.succeeded()) {
-                System.out.println("Embedded MongoDB Verticle successfully deployed");
-                deployVerticles(vertx);
+                System.out.println("Embedded MongoDB Verticle deployed");
             } else {
-                System.out.println("ERROR: Embedded MongoDB Verticle deployment failed!");
+                System.out.println("Embedded MongoDB Verticle not deployed (" + res.cause().getMessage() + ")");
             }
+            deployVerticles(chat, web);
         });
-    }
 
-    private static void deployVerticles(Vertx vertx) {
-        vertx.deployVerticle(new ChatVerticle(), completionHandler -> {
-            if (completionHandler.succeeded()) {
+        CompositeFuture.join(web, chat).setHandler(ar -> {
+            if (chat.succeeded()) {
                 System.out.println("ChatVerticle successfully deployed");
             } else {
                 System.out.println("ERROR: ChatVerticle deployment failed!");
             }
-        });
 
-        vertx.deployVerticle(new WebsiteVerticle(), completionHandler -> {
-            if (completionHandler.succeeded()) {
-                System.out.println("WebsiteVerticle successfully deployed," +
-                        " visit: http://localhost:8080");
+            if (web.succeeded()) {
+                System.out.println("WebsiteVerticle successfully deployed");
             } else {
                 System.out.println("ERROR: WebsiteVerticle deployment failed!");
             }
+
+            if(chat.succeeded() && web.succeeded()) {
+                System.out.println("Visit: http://localhost:8080");
+            }
         });
+    }
+
+    private static void deployEmbeddedMongoDB(Future<String> embeddedMongo) {
+        // The MongoDB download need some time. After that, any further start will be much faster
+        VertxOptions vertxOptions = new VertxOptions().setMaxWorkerExecuteTime(30 * 60 * 1000);
+        Vertx.vertx(vertxOptions);
+
+        // a port number is needed by EmbeddedMongoVerticle
+        DeploymentOptions mongoOptions = new DeploymentOptions().setWorker(true)
+                .setConfig(new JsonObject().put("port", EMBEDDED_MONGO_DB_PORT));
+        vertx.deployVerticle(new EmbeddedMongoVerticle(), mongoOptions, embeddedMongo);
+    }
+
+    private static void deployVerticles(Future<String> chat, Future<String> web) {
+        vertx.deployVerticle(new ChatVerticle(), chat.completer());
+        vertx.deployVerticle(new WebsiteVerticle(), web.completer());
     }
 }
