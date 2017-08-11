@@ -1,5 +1,6 @@
 package io.github.chhch.vertxChat.verticles.chat;
 
+import io.github.chhch.vertxChat.I18n;
 import io.github.chhch.vertxChat.persistence.DbOperation;
 import io.github.chhch.vertxChat.verticles.enums.EventBusAddresses;
 import io.github.chhch.vertxChat.verticles.enums.JsonKeys;
@@ -32,11 +33,16 @@ class ConversationLoadHandler implements Handler<Message<JsonObject>> {
         String sender = message.headers().get(JsonKeys.SOURCE.get());
         String contact = message.body().getString(JsonKeys.CONTACT.get());
         JsonArray usernameList = ChatVerticle.getAsJsonArray(sender, contact);
+
         dbOperation.countUsersWhichAreRegistered(usernameList, result -> {
             if (result.succeeded() && result.result() >= usernameList.size()) {
                 markMessagesAsReadAndSendThem(message);
             } else {
-                message.reply(ChatVerticle.getStatusMessage(JsonKeys.Status.DANGER.get(), "Nutzer nicht gefunden."));
+                JsonObject conversationLoadFailedUserNotFound = ChatVerticle.getStatusMessage(
+                        JsonKeys.Status.DANGER.get(),
+                        I18n.INSTANCE.getString("conversationLoadFailedUserNotFound")
+                );
+                message.reply(conversationLoadFailedUserNotFound);
             }
         });
     }
@@ -46,7 +52,7 @@ class ConversationLoadHandler implements Handler<Message<JsonObject>> {
         source = message.headers().get(JsonKeys.SOURCE.get());
         contact = message.body().getString(JsonKeys.CONTACT.get());
 
-        if(onlyUnreadFromContact) {
+        if (onlyUnreadFromContact) {
             dbOperation.findUnreadMessagesFromContact(source, contact, result -> handleResult(message, result));
         } else {
             dbOperation.findConversation(source, contact, result -> handleResult(message, result));
@@ -55,12 +61,19 @@ class ConversationLoadHandler implements Handler<Message<JsonObject>> {
 
     private void handleResult(Message<JsonObject> message, AsyncResult<List<JsonObject>> result) {
         if (result.succeeded()) {
-            message.reply(ChatVerticle.getStatusMessage(JsonKeys.Status.SUCCESS.get(), "Konversation erfolgreich geladen.")
-                    .put(JsonKeys.CONVERSATION.get(), result.result()));
-
+            JsonObject conversationLoadSucceeded = ChatVerticle.getStatusMessage(
+                    JsonKeys.Status.SUCCESS.get(),
+                    I18n.INSTANCE.getString("conversationLoadSucceeded")
+            );
+            conversationLoadSucceeded.put(JsonKeys.CONVERSATION.get(), result.result());
+            message.reply(conversationLoadSucceeded);
             markMessageAsRead();
         } else {
-            message.reply(ChatVerticle.getStatusMessage(JsonKeys.Status.DANGER.get(), "Konnte Konversation nicht laden."));
+            JsonObject conversationLoadFailed = ChatVerticle.getStatusMessage(
+                    JsonKeys.Status.DANGER.get(),
+                    I18n.INSTANCE.getString("conversationLoadFailed")
+            );
+            message.reply(conversationLoadFailed);
             result.cause().printStackTrace();
         }
     }

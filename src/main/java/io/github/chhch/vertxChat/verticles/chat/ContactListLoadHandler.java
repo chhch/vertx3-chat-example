@@ -1,5 +1,6 @@
 package io.github.chhch.vertxChat.verticles.chat;
 
+import io.github.chhch.vertxChat.I18n;
 import io.github.chhch.vertxChat.persistence.DbOperation;
 import io.github.chhch.vertxChat.verticles.enums.JsonKeys;
 import io.vertx.core.Handler;
@@ -28,7 +29,11 @@ class ContactListLoadHandler implements Handler<Message<JsonObject>> {
             if (result.succeeded()) {
                 message.reply(result.result());
             } else {
-                message.reply(ChatVerticle.getStatusMessage(JsonKeys.Status.DANGER.get(), "Konnte Kontaktliste nicht laden."));
+                JsonObject contactListLoadFailed = ChatVerticle.getStatusMessage(
+                        JsonKeys.Status.DANGER.get(),
+                        I18n.INSTANCE.getString("contactListLoadFailed")
+                );
+                message.reply(contactListLoadFailed);
                 result.cause().printStackTrace();
             }
         });

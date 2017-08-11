@@ -1,5 +1,6 @@
 package io.github.chhch.vertxChat.verticles.chat;
 
+import io.github.chhch.vertxChat.I18n;
 import io.github.chhch.vertxChat.persistence.DbOperation;
 import io.github.chhch.vertxChat.verticles.enums.EventBusAddresses;
 import io.github.chhch.vertxChat.verticles.enums.JsonKeys;
@@ -30,19 +31,26 @@ class MessageSendHandler implements Handler<Message<JsonObject>> {
         String sender = bridgeMessage.headers().get(JsonKeys.SOURCE.get());
         String receiver = bridgeMessage.body().getString(JsonKeys.RECEIVER.get());
         JsonArray usernameList = ChatVerticle.getAsJsonArray(sender, receiver);
+
         dbOperation.countUsersWhichAreRegistered(usernameList, result -> {
             if (result.succeeded() && result.result() >= usernameList.size()) {
-
                 dbOperation.findUserWithContactInTheirList(sender, receiver, user -> {
                     if (user.succeeded() && !user.result().isEmpty()) {
                         persistAndSendMessage(bridgeMessage);
                     } else {
-                        bridgeMessage.reply(ChatVerticle.getStatusMessage(JsonKeys.Status.DANGER.get(), "Empfaenger befindet sich nicht in der Kontaktliste des Nutzers."));
+                        JsonObject messageSendFailedReceiverIsNotAContact = ChatVerticle.getStatusMessage(
+                                JsonKeys.Status.DANGER.get(),
+                                I18n.INSTANCE.getString("messageSendFailedReceiverIsNotAContact")
+                        );
+                        bridgeMessage.reply(messageSendFailedReceiverIsNotAContact);
                     }
                 });
-
             } else {
-                bridgeMessage.reply(ChatVerticle.getStatusMessage(JsonKeys.Status.INFO.get(), "Bitte zuerst einen Kontakt auswaehlen."));
+                JsonObject messageSendFailedNoContactSelected = ChatVerticle.getStatusMessage(
+                        JsonKeys.Status.INFO.get(),
+                        I18n.INSTANCE.getString("messageSendFailedNoContactSelected")
+                );
+                bridgeMessage.reply(messageSendFailedNoContactSelected);
             }
         });
     }
@@ -71,9 +79,17 @@ class MessageSendHandler implements Handler<Message<JsonObject>> {
                         .put(JsonKeys.READ.get(), false);
 
                 eventBus.publish(EventBusAddresses.CHAT_RECEIVE_MESSAGE.get() + "." + receiver, document);
-                bridgeMessage.reply(ChatVerticle.getStatusMessage(JsonKeys.Status.SUCCESS.get(), "Nachricht wurde gesendet.").mergeIn(document));
+                JsonObject messageSendSucceeded = ChatVerticle.getStatusMessage(
+                        JsonKeys.Status.SUCCESS.get(),
+                        I18n.INSTANCE.getString("messageSendSucceeded")
+                ).mergeIn(document);
+                bridgeMessage.reply(messageSendSucceeded);
             } else {
-                bridgeMessage.reply(ChatVerticle.getStatusMessage(JsonKeys.Status.DANGER.get(), "Nachricht konnte nicht gesendet werden."));
+                JsonObject messageSendFailed = ChatVerticle.getStatusMessage(
+                        JsonKeys.Status.DANGER.get(),
+                        I18n.INSTANCE.getString("messageSendFailed")
+                );
+                bridgeMessage.reply(messageSendFailed);
                 result.cause().printStackTrace();
             }
         });
