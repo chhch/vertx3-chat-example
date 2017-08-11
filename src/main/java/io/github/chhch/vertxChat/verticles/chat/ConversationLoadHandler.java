@@ -40,7 +40,7 @@ class ConversationLoadHandler implements Handler<Message<JsonObject>> {
             } else {
                 JsonObject conversationLoadFailedUserNotFound = ChatVerticle.getStatusMessage(
                         JsonKeys.Status.DANGER.get(),
-                        I18n.INSTANCE.getString("conversationLoadFailedUserNotFound")
+                        I18n.getString("conversationLoadFailedUserNotFound")
                 );
                 message.reply(conversationLoadFailedUserNotFound);
             }
@@ -63,7 +63,7 @@ class ConversationLoadHandler implements Handler<Message<JsonObject>> {
         if (result.succeeded()) {
             JsonObject conversationLoadSucceeded = ChatVerticle.getStatusMessage(
                     JsonKeys.Status.SUCCESS.get(),
-                    I18n.INSTANCE.getString("conversationLoadSucceeded")
+                    I18n.getString("conversationLoadSucceeded")
             );
             conversationLoadSucceeded.put(JsonKeys.CONVERSATION.get(), result.result());
             message.reply(conversationLoadSucceeded);
@@ -71,7 +71,7 @@ class ConversationLoadHandler implements Handler<Message<JsonObject>> {
         } else {
             JsonObject conversationLoadFailed = ChatVerticle.getStatusMessage(
                     JsonKeys.Status.DANGER.get(),
-                    I18n.INSTANCE.getString("conversationLoadFailed")
+                    I18n.getString("conversationLoadFailed")
             );
             message.reply(conversationLoadFailed);
             result.cause().printStackTrace();

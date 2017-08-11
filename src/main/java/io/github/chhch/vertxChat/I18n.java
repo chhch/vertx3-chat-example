@@ -11,7 +11,7 @@ public enum I18n {
 
     private ResourceBundle messages = ResourceBundle.getBundle("MessagesBundle", Locale.US);
 
-    public String getString(String key) {
-        return messages.getString(key);
+    public static String getString(String key) {
+        return INSTANCE.messages.getString(key);
     }
 }

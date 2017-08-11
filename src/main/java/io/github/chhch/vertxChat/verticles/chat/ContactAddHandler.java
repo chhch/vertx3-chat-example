@@ -32,7 +32,7 @@ class ContactAddHandler implements Handler<Message<JsonObject>> {
         if (sender.equals(contact)) {
             JsonObject contactAddFailedSelfAdding = ChatVerticle.getStatusMessage(
                     JsonKeys.Status.DANGER.get(),
-                    I18n.INSTANCE.getString("contactAddFailedSelfAdding")
+                    I18n.getString("contactAddFailedSelfAdding")
             );
             message.reply(contactAddFailedSelfAdding);
             return;
@@ -46,7 +46,7 @@ class ContactAddHandler implements Handler<Message<JsonObject>> {
                     } else {
                         JsonObject contactAddFailedAlreadyAdded = ChatVerticle.getStatusMessage(
                                 JsonKeys.Status.DANGER.get(),
-                                I18n.INSTANCE.getString("contactAddFailedAlreadyAdded")
+                                I18n.getString("contactAddFailedAlreadyAdded")
                         );
                         message.reply(contactAddFailedAlreadyAdded);
                     }
@@ -54,7 +54,7 @@ class ContactAddHandler implements Handler<Message<JsonObject>> {
             } else {
                 JsonObject contactAddFailedNotFound = ChatVerticle.getStatusMessage(
                         JsonKeys.Status.DANGER.get(),
-                        I18n.INSTANCE.getString("contactAddFailedNotFound")
+                        I18n.getString("contactAddFailedNotFound")
                 );
                 message.reply(contactAddFailedNotFound);
             }
@@ -76,14 +76,14 @@ class ContactAddHandler implements Handler<Message<JsonObject>> {
                 eventBus.publish(EventBusAddresses.CHAT_RECEIVE_CONTACT.get() + "." + newContact, source);
                 JsonObject contactListRefreshSucceeded = ChatVerticle.getStatusMessage(
                         JsonKeys.Status.SUCCESS.get(),
-                        I18n.INSTANCE.getString("contactListRefreshSucceeded")
+                        I18n.getString("contactListRefreshSucceeded")
                 );
                 contactListRefreshSucceeded.put(JsonKeys.CONTACT.get(), newContact);
                 message.reply(contactListRefreshSucceeded);
             } else {
                 JsonObject contactListRefreshFailed = ChatVerticle.getStatusMessage(
                         JsonKeys.Status.DANGER.get(),
-                        I18n.INSTANCE.getString("contactListRefreshFailed")
+                        I18n.getString("contactListRefreshFailed")
                 );
                 message.reply(contactListRefreshFailed);
                 result.cause().printStackTrace();

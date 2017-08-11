@@ -31,7 +31,7 @@ class ContactListLoadHandler implements Handler<Message<JsonObject>> {
             } else {
                 JsonObject contactListLoadFailed = ChatVerticle.getStatusMessage(
                         JsonKeys.Status.DANGER.get(),
-                        I18n.INSTANCE.getString("contactListLoadFailed")
+                        I18n.getString("contactListLoadFailed")
                 );
                 message.reply(contactListLoadFailed);
                 result.cause().printStackTrace();

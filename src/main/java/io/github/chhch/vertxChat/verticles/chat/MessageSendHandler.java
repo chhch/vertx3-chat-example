@@ -40,7 +40,7 @@ class MessageSendHandler implements Handler<Message<JsonObject>> {
                     } else {
                         JsonObject messageSendFailedReceiverIsNotAContact = ChatVerticle.getStatusMessage(
                                 JsonKeys.Status.DANGER.get(),
-                                I18n.INSTANCE.getString("messageSendFailedReceiverIsNotAContact")
+                                I18n.getString("messageSendFailedReceiverIsNotAContact")
                         );
                         bridgeMessage.reply(messageSendFailedReceiverIsNotAContact);
                     }
@@ -48,7 +48,7 @@ class MessageSendHandler implements Handler<Message<JsonObject>> {
             } else {
                 JsonObject messageSendFailedNoContactSelected = ChatVerticle.getStatusMessage(
                         JsonKeys.Status.INFO.get(),
-                        I18n.INSTANCE.getString("messageSendFailedNoContactSelected")
+                        I18n.getString("messageSendFailedNoContactSelected")
                 );
                 bridgeMessage.reply(messageSendFailedNoContactSelected);
             }
@@ -81,13 +81,13 @@ class MessageSendHandler implements Handler<Message<JsonObject>> {
                 eventBus.publish(EventBusAddresses.CHAT_RECEIVE_MESSAGE.get() + "." + receiver, document);
                 JsonObject messageSendSucceeded = ChatVerticle.getStatusMessage(
                         JsonKeys.Status.SUCCESS.get(),
-                        I18n.INSTANCE.getString("messageSendSucceeded")
+                        I18n.getString("messageSendSucceeded")
                 ).mergeIn(document);
                 bridgeMessage.reply(messageSendSucceeded);
             } else {
                 JsonObject messageSendFailed = ChatVerticle.getStatusMessage(
                         JsonKeys.Status.DANGER.get(),
-                        I18n.INSTANCE.getString("messageSendFailed")
+                        I18n.getString("messageSendFailed")
                 );
                 bridgeMessage.reply(messageSendFailed);
                 result.cause().printStackTrace();
