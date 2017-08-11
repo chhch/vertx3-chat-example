@@ -36,14 +36,14 @@ class BridgeEventHandler implements Handler<BridgeEvent> {
 
         switch (bridgeEvent.type()) {
             case REGISTER:
-                String address = bridgeEvent.rawMessage().getString("address");
+                String address = bridgeEvent.getRawMessage().getString("address");
                 if (!address.endsWith(username)) {
                     bridgeEvent.complete(false);
                     break;
                 }
             case SEND:
             case PUBLISH:
-                bridgeEvent.rawMessage().put("headers", new JsonObject().put("_source", username));
+                bridgeEvent.getRawMessage().put("headers", new JsonObject().put("_source", username));
             default:
                 bridgeEvent.complete(true);
         }
