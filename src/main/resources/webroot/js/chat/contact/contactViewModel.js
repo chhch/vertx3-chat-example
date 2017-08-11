@@ -2,7 +2,7 @@ define(['jquery', 'knockout', 'contact/contactModel', 'alert/alertModel'],
     function ($, ko, Contact, Alert) {
         'use strict';
 
-        var ViewModel = function (eventbus, postbox) {
+        return function (eventbus, postbox) {
             var self = this;
 
             self.eventBus = eventbus;
@@ -19,7 +19,7 @@ define(['jquery', 'knockout', 'contact/contactModel', 'alert/alertModel'],
 
             self.eventBus.send(self.addressGetContactMap, null, function (message) {
                 var contacts = message.contactList;
-                for(var i = 0; i < contacts.length; i++) {
+                for (var i = 0; i < contacts.length; i++) {
                     self.contacts.push(new Contact(contacts[i].name, contacts[i].unreadMessages));
                 }
             });
@@ -55,8 +55,8 @@ define(['jquery', 'knockout', 'contact/contactModel', 'alert/alertModel'],
             };
 
             postbox.subscribe(function (contactName) {
-                for(var i = 0; i < self.contacts().length; i++) {
-                    if(self.contacts()[i].name() === contactName) {
+                for (var i = 0; i < self.contacts().length; i++) {
+                    if (self.contacts()[i].name() === contactName) {
                         var inkrementedMessageCount = self.contacts()[i].unreadMessageCount() + 1;
                         self.contacts()[i].unreadMessageCount(inkrementedMessageCount);
                         break;
@@ -65,15 +65,13 @@ define(['jquery', 'knockout', 'contact/contactModel', 'alert/alertModel'],
             }, this, "incrementUnreadMessageCount");
 
             postbox.subscribe(function (contactName) {
-                for(var i = 0; i < self.contacts().length; i++) {
-                    if(self.contacts()[i].name() === contactName) {
+                for (var i = 0; i < self.contacts().length; i++) {
+                    if (self.contacts()[i].name() === contactName) {
                         self.contacts()[i].unreadMessageCount(0);
                         break;
                     }
                 }
             }, this, "resetUnreadMessageCount");
         };
-
-        return ViewModel;
     }
 );

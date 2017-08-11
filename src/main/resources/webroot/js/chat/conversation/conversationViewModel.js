@@ -2,7 +2,7 @@ define(['jquery', 'knockout', 'conversation/messageModel', 'alert/alertModel', '
     function ($, ko, Message, Alert) {
         'use strict';
 
-        var ViewModel = function (eventbus, postbox) {
+        return function (eventbus, postbox) {
             var self = this;
 
             self.eventBus = eventbus;
@@ -17,8 +17,8 @@ define(['jquery', 'knockout', 'conversation/messageModel', 'alert/alertModel', '
 
             self.conversation = ko.observableArray();
 
-            var timer = setInterval(function() {
-                self.conversation().forEach(function(message) {
+            var timer = setInterval(function () {
+                self.conversation().forEach(function (message) {
                     message.updatePrettyDate();
                 });
             }, 60 * 1000);
@@ -30,10 +30,10 @@ define(['jquery', 'knockout', 'conversation/messageModel', 'alert/alertModel', '
             postbox.subscribe(function (newValue) {
                 self.selectedContact(newValue.name());
                 self.force(true);
-                var conversationAlreadyLoaded = self.conversation().some(function(element) {
+                var conversationAlreadyLoaded = self.conversation().some(function (element) {
                     return (element.sender() === self.selectedContact()) || (element.receiver() === self.selectedContact());
                 });
-                var messageJson = {"contact": newValue.name(), "onlyUnread": conversationAlreadyLoaded };
+                var messageJson = {"contact": newValue.name(), "onlyUnread": conversationAlreadyLoaded};
                 self.eventBus.send(self.addressGetConversation, messageJson, self.getConversationReplyHandler);
             }, this, "messageToPublish");
 
@@ -54,8 +54,8 @@ define(['jquery', 'knockout', 'conversation/messageModel', 'alert/alertModel', '
                     message = new Message(entry.sender, entry.receiver, entry.message, entry.read, entry.date);
                     self.conversation.push(message);
                 });
-                if(message === null) {
-                    message = self.conversation().reduce(function(previousValue, currentValue) {
+                if (message === null) {
+                    message = self.conversation().reduce(function (previousValue, currentValue) {
                         return (currentValue.sender() === self.selectedContact()) || (currentValue.receiver() === self.selectedContact()) ? currentValue : previousValue;
                     });
                 }
@@ -108,7 +108,7 @@ define(['jquery', 'knockout', 'conversation/messageModel', 'alert/alertModel', '
 
             self.myPostProcessingLogic = function (elements) {
                 emojione.ascii = true;
-                $(elements).children('p').each(function() {
+                $(elements).children('p').each(function () {
                     var input = $(this).text();
                     console.log('input: ' + input);
                     var output = emojione.toImage(input);
@@ -117,7 +117,5 @@ define(['jquery', 'knockout', 'conversation/messageModel', 'alert/alertModel', '
                 });
             }
         };
-
-        return ViewModel;
     }
 );

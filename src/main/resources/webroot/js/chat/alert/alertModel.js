@@ -3,7 +3,7 @@ define(['jquery', 'knockout'],
     function ($, ko) {
         'use strict';
 
-        var Model = function (type, message) {
+        return function (type, message) {
             this.type = ko.observable(type);
             this.message = ko.observable(message);
             this.cssClass = ko.pureComputed(function () {
@@ -19,7 +19,5 @@ define(['jquery', 'knockout'],
                 return iconMap[this.type()];
             }, this);
         };
-
-        return Model;
     }
 );
