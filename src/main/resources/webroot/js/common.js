@@ -16,8 +16,8 @@ requirejs.config({
     },
     "shim": {
         /* Set bootstrap dependencies, because bootstrap don't support AM */
-        'bootstrap' : ['jquery'],
-        'dateformat' : ['jquery']
+        'bootstrap': ['jquery'],
+        'dateformat': ['jquery']
     }
 });
 

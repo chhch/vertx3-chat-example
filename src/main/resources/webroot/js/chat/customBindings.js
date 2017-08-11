@@ -53,7 +53,7 @@ define(['knockout'], function (ko) {
             if (_valueUnwrapped) {
                 var parent = $(element).parent()[0];
                 var actualPosition = parent.scrollHeight - parent.clientHeight - $(element).outerHeight(true);
-                if((parent.scrollTop === actualPosition) || bindingContext.$root.force())
+                if ((parent.scrollTop === actualPosition) || bindingContext.$root.force())
                     element.scrollIntoView();
             }
         }
