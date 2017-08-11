@@ -27,7 +27,7 @@ requirejs(['common'], function () {
                     window.location.href = "/logout";
                 };
 
-                $('logout').click(function (e) {
+                $('#logout').click(function () {
                     eb.close();
                 });
 

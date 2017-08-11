@@ -15,3 +15,7 @@ body {
     width: 25px;
     text-align: center;
 }
+
+.loginPanel {
+    max-width: 360px;
+}

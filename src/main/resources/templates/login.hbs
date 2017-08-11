@@ -7,9 +7,6 @@
         body {
             padding-top: 40px;
         }
-        .loginPanel {
-            max-width: 360px;
-        }
     </style>
 {{/partial}}
 
@@ -18,39 +15,39 @@
         <div class="panel panel-default center-block loginPanel">
             <div class="panel-heading">
                 <h1><i class="fa fa-comments"></i> Chat
-                    <small>Anmeldung</small>
+                    <small>Sign in</small>
                 </h1>
             </div>
             <div class="panel-body">
                 <form action="/loginhandler" method="post">
                     <div class="form-group">
-                        <label for="username" class="sr-only">Benutzername</label>
+                        <label for="username" class="sr-only">Name</label>
 
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-user fa-fw"></i></span>
                             <input type="text" class="form-control" id="username" name="username"
-                                   placeholder="Benutzername"
+                                   placeholder="Name"
                                    required autofocus>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label for="password" class="sr-only">Passwort</label>
+                        <label for="password" class="sr-only">Password</label>
 
                         <div class="input-group">
                             <span class="input-group-addon"><i class="fa fa-lock fa-fw"></i></span>
                             <input type="password" class="form-control" id="password" name="password"
-                                   placeholder="Passwort"
+                                   placeholder="Password"
                                    required>
                         </div>
                     </div>
-                    <button type="submit" class="btn btn-primary btn-lg btn-block">
-                        Anmelden
+                    <button class="btn btn-primary btn-lg btn-block">
+                        Sign in
                     </button>
                 </form>
             </div>
             <div class="panel-footer">
-                <p class="help-block text-center">Du hast noch kein Benutzerkonto erstellt? Hier geht's zur <a
-                        href="/registration.hbs" role="button">Registrierung</a>.</p>
+                <p class="help-block text-center">You don't have a account yet? <a
+                        href="/registration.hbs">Sign up</a>.</p>
             </div>
         </div>
     </div>
