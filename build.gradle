@@ -1,31 +1,20 @@
-group 'io.github.chhch'
-
-buildscript {
-    repositories { jcenter() }
-    dependencies {
-        classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.2'
-    }
+plugins {
+    id 'java'
+    id 'application'
+    id 'com.github.johnrengelman.shadow' version '1.2.3'
 }
 
-apply plugin: 'java'
-apply plugin: 'com.github.johnrengelman.shadow'
+group 'io.github.chhch'
+
+repositories {
+    jcenter()
+    maven {
+        url "https://oss.sonatype.org/content/repositories/iovertx-3684/"
+    }
+}
 
 sourceCompatibility = '1.8'
 version = '3.4.2'
-
-if (!JavaVersion.current().java8Compatible) {
-    throw new IllegalStateException('''A Haiku:
-                                      |  This needs Java 8,
-                                      |  You are using something else,
-                                      |  Refresh. Try again.'''.stripMargin())
-}
-
-repositories {
-    mavenCentral()
-    maven {
-        url = 'https://oss.sonatype.org/content/repositories/snapshots/'
-    }
-}
 
 dependencies {
     compile "io.vertx:vertx-core:$version"
@@ -38,10 +27,12 @@ dependencies {
     compile "com.github.jknack:handlebars:2.2.3" // Template-Engine
 }
 
+mainClassName = 'io.github.chhch.vertxChat.ChatApp'
+
 shadowJar {
     classifier = 'fat'
     manifest {
-        attributes 'Main-Class': 'io.github.chhch.ChatApp'
+        attributes 'Main-Class': mainClassName
     }
     mergeServiceFiles {
         include 'META-INF/services/io.vertx.core.spi.VerticleFactory'
@@ -52,4 +43,8 @@ shadowJar {
     into('webroot') {
         from 'src/main/resources/webroot'
     }
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '4.0'
 }
