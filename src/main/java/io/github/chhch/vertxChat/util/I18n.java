@@ -1,4 +1,4 @@
-package io.github.chhch.vertxChat;
+package io.github.chhch.vertxChat.util;
 
 import java.util.Locale;
 import java.util.ResourceBundle;

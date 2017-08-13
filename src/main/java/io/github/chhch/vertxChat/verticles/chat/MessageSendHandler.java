@@ -1,6 +1,6 @@
 package io.github.chhch.vertxChat.verticles.chat;
 
-import io.github.chhch.vertxChat.I18n;
+import io.github.chhch.vertxChat.util.I18n;
 import io.github.chhch.vertxChat.persistence.DbOperation;
 import io.github.chhch.vertxChat.verticles.enums.EventBusAddresses;
 import io.github.chhch.vertxChat.verticles.enums.JsonKeys;
