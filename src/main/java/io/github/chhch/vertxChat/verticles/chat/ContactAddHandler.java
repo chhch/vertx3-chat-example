@@ -1,13 +1,14 @@
 package io.github.chhch.vertxChat.verticles.chat;
 
-import io.github.chhch.vertxChat.util.I18n;
 import io.github.chhch.vertxChat.persistence.DbOperation;
+import io.github.chhch.vertxChat.util.I18n;
 import io.github.chhch.vertxChat.verticles.enums.EventBusAddresses;
 import io.github.chhch.vertxChat.verticles.enums.JsonKeys;
+import io.vertx.core.CompositeFuture;
+import io.vertx.core.Future;
 import io.vertx.core.Handler;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.eventbus.Message;
-import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 /**
@@ -18,7 +19,7 @@ class ContactAddHandler implements Handler<Message<JsonObject>> {
     private final DbOperation dbOperation;
     private final EventBus eventBus;
 
-    public ContactAddHandler(DbOperation dbOperation, EventBus eventBus) {
+    ContactAddHandler(DbOperation dbOperation, EventBus eventBus) {
         this.dbOperation = dbOperation;
         this.eventBus = eventBus;
     }
@@ -27,7 +28,6 @@ class ContactAddHandler implements Handler<Message<JsonObject>> {
     public void handle(Message<JsonObject> message) {
         String sender = message.headers().get(JsonKeys.SOURCE.get());
         String contact = message.body().getString(JsonKeys.CONTACT.get());
-        JsonArray usernameList = ChatVerticle.getAsJsonArray(sender, contact);
 
         if (sender.equals(contact)) {
             JsonObject contactAddFailedSelfAdding = ChatVerticle.getStatusMessage(
@@ -38,25 +38,26 @@ class ContactAddHandler implements Handler<Message<JsonObject>> {
             return;
         }
 
-        dbOperation.countUsersWhichAreRegistered(usernameList, result -> {
-            if (result.succeeded() && result.result() == usernameList.size()) {
-                dbOperation.findUserWithContactInTheirList(sender, contact, user -> {
-                    if (user.succeeded() && user.result().isEmpty()) {
-                        persistAndSendContact(message);
-                    } else {
-                        JsonObject contactAddFailedAlreadyAdded = ChatVerticle.getStatusMessage(
-                                JsonKeys.Status.DANGER.get(),
-                                I18n.getString("contactAddFailedAlreadyAdded")
-                        );
-                        message.reply(contactAddFailedAlreadyAdded);
-                    }
-                });
-            } else {
-                JsonObject contactAddFailedNotFound = ChatVerticle.getStatusMessage(
+        Future<JsonObject> findUser = Future.future();
+        Future<JsonObject> findContact = Future.future();
+        dbOperation.findUser(contact, findUser.completer());
+        dbOperation.findContact(sender, contact, findContact.completer());
+
+        CompositeFuture.join(findUser, findContact).setHandler(result -> {
+            if (result.result().failed(0) || result.result().resultAt(0) == null) {
+                JsonObject contactAddFailedUserNotFound = ChatVerticle.getStatusMessage(
                         JsonKeys.Status.DANGER.get(),
-                        I18n.getString("contactAddFailedNotFound")
+                        I18n.getString("contactAddFailedUserNotFound")
                 );
-                message.reply(contactAddFailedNotFound);
+                message.reply(contactAddFailedUserNotFound);
+            } else if (result.result().failed(1) || result.result().resultAt(1) != null) {
+                JsonObject contactAddFailedAlreadyAdded = ChatVerticle.getStatusMessage(
+                        JsonKeys.Status.DANGER.get(),
+                        I18n.getString("contactAddFailedAlreadyAdded")
+                );
+                message.reply(contactAddFailedAlreadyAdded);
+            } else {
+                persistAndSendContact(message);
             }
         });
     }
@@ -65,13 +66,13 @@ class ContactAddHandler implements Handler<Message<JsonObject>> {
         String source = message.headers().get(JsonKeys.SOURCE.get());
         String newContact = message.body().getString(JsonKeys.CONTACT.get());
 
-        dbOperation.updateUsersContactList(newContact, source, result -> {
+        dbOperation.updateContactList(newContact, source, result -> {
             if (result.failed()) {
                 result.cause().printStackTrace();
             }
         });
 
-        dbOperation.updateUsersContactList(source, newContact, result -> {
+        dbOperation.updateContactList(source, newContact, result -> {
             if (result.succeeded()) {
                 eventBus.publish(EventBusAddresses.CHAT_RECEIVE_CONTACT.get() + "." + newContact, source);
                 JsonObject contactListRefreshSucceeded = ChatVerticle.getStatusMessage(

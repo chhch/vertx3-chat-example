@@ -6,6 +6,7 @@ import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.mongo.FindOptions;
 import io.vertx.ext.mongo.MongoClient;
+import io.vertx.ext.mongo.MongoClientUpdateResult;
 import io.vertx.ext.mongo.UpdateOptions;
 
 import java.util.List;
@@ -21,23 +22,23 @@ public class DbOperation {
         this.mongoClient = mongoClient;
     }
 
-    public void updateMessagesOfOneConversationAsRead(String source, String contact, Handler<AsyncResult<Void>> asyncResultHandler) {
-        updateOneOrMoreMessagesOfConversationAsRead(source, contact, asyncResultHandler, true);
+    public void updateMessagesAsRead(String source, String contact, Handler<AsyncResult<MongoClientUpdateResult>> asyncResultHandler) {
+        updateMessagesAsRead(source, contact, asyncResultHandler, true);
     }
 
-    public void updateFirstUnreadMessageOfOneConversationAsRead(String receiver, String sender, Handler<AsyncResult<Void>> asyncResultHandler) {
-        updateOneOrMoreMessagesOfConversationAsRead(receiver, sender, asyncResultHandler, false);
+    public void updateFirstUnreadMessageAsRead(String receiver, String sender, Handler<AsyncResult<MongoClientUpdateResult>> asyncResultHandler) {
+        updateMessagesAsRead(receiver, sender, asyncResultHandler, false);
     }
 
-    public void resetUnreadMessageCount(String user, String contact, Handler<AsyncResult<Void>> asyncResultHandler) {
+    public void resetUnreadMessageCount(String user, String contact, Handler<AsyncResult<MongoClientUpdateResult>> asyncResultHandler) {
         updateUnreadMessageCount(user, contact, "$set", 0, asyncResultHandler);
     }
 
-    public void incrementUnreadMessageCount(String sender, String receiver, Handler<AsyncResult<Void>> asyncResultHandler) {
+    public void incrementUnreadMessageCount(String sender, String receiver, Handler<AsyncResult<MongoClientUpdateResult>> asyncResultHandler) {
         updateUnreadMessageCount(receiver, sender, "$inc", 1, asyncResultHandler);
     }
 
-    public void decrementUnreadMessageCount(String sender, String receiver, Handler<AsyncResult<Void>> asyncResultHandler) {
+    public void decrementUnreadMessageCount(String sender, String receiver, Handler<AsyncResult<MongoClientUpdateResult>> asyncResultHandler) {
         updateUnreadMessageCount(receiver, sender, "$inc", -1, asyncResultHandler);
     }
 
@@ -52,7 +53,7 @@ public class DbOperation {
         mongoClient.findWithOptions(DbIdentifier.MESSAGE_COL.get(), query, options, asyncResultHandler);
     }
 
-    public void findConversation(String source, String contact, Handler<AsyncResult<List<JsonObject>>> asyncResultHandler) {
+    public void findMessagesFromContact(String source, String contact, Handler<AsyncResult<List<JsonObject>>> asyncResultHandler) {
         JsonObject query = new JsonObject().put("$or", new JsonArray()
                 .add(new JsonObject()
                         .put(DbIdentifier.MESSAGE_SENDER_FLD.get(), source)
@@ -77,47 +78,48 @@ public class DbOperation {
         mongoClient.insert(DbIdentifier.MESSAGE_COL.get(), document, asyncResultHandler);
     }
 
-    public void findUsersContactList(String source, Handler<AsyncResult<JsonObject>> asyncResultHandler) {
+    public void findContactList(String source, Handler<AsyncResult<JsonObject>> asyncResultHandler) {
         JsonObject query = new JsonObject().put(DbIdentifier.USER_NAME_FLD.get(), source);
         JsonObject fields = new JsonObject().put(DbIdentifier.USER_CONTACTS_MAP.get(), 1);
 
         mongoClient.findOne(DbIdentifier.USER_COL.get(), query, fields, asyncResultHandler);
     }
 
-    public void updateUsersContactList(String user, String newContact, Handler<AsyncResult<Void>> asyncResultHandler) {
+    public void updateContactList(String user, String newContact, Handler<AsyncResult<MongoClientUpdateResult>> asyncResultHandler) {
         JsonObject query = new JsonObject().put(DbIdentifier.USER_NAME_FLD.get(), user);
         JsonObject update = new JsonObject().put("$addToSet", new JsonObject().put(DbIdentifier.USER_CONTACTS_MAP.get(), new JsonObject()
                 .put(DbIdentifier.USER_CONTACTS_NAME_FLD.get(), newContact).put(DbIdentifier.USER_CONTACTS_UNREADMESSAGES_FLD.get(), 0)));
 
-        mongoClient.update(DbIdentifier.USER_COL.get(), query, update, asyncResultHandler);
+        mongoClient.updateCollection(DbIdentifier.USER_COL.get(), query, update, asyncResultHandler);
     }
 
-    public void countUsersWhichAreRegistered(JsonArray usernameList, Handler<AsyncResult<Long>> asyncResultHandler1) {
-        JsonObject inQuery = new JsonObject().put("$in", usernameList);
-        JsonObject query = new JsonObject().put(DbIdentifier.USER_NAME_FLD.get(), inQuery);
+    public void findUser(String user, Handler<AsyncResult<JsonObject>> asyncResultHandler1) {
+        JsonObject query = new JsonObject().put(DbIdentifier.USER_NAME_FLD.get(), user);
+        JsonObject fields = new JsonObject().put(DbIdentifier.USER_NAME_FLD.get(), 1);
 
-        mongoClient.count(DbIdentifier.USER_COL.get(), query, asyncResultHandler1);
+        mongoClient.findOne(DbIdentifier.USER_COL.get(), query, fields, asyncResultHandler1);
     }
 
-    public void findUserWithContactInTheirList(String user, String contact, Handler<AsyncResult<List<JsonObject>>> asyncResultHandler) {
+    public void findContact(String user, String contact, Handler<AsyncResult<JsonObject>> asyncResultHandler) {
         JsonObject query = new JsonObject()
                 .put(DbIdentifier.USER_NAME_FLD.get(), user)
                 .put(DbIdentifier.USER_CONTACTS_MAP.get() + "." + DbIdentifier.USER_CONTACTS_NAME_FLD.get(), contact);
+        JsonObject fields = new JsonObject().put(DbIdentifier.USER_NAME_FLD.get(), 1);
 
-        mongoClient.find(DbIdentifier.USER_COL.get(), query, asyncResultHandler);
+        mongoClient.findOne(DbIdentifier.USER_COL.get(), query, fields, asyncResultHandler);
     }
 
-    private void updateUnreadMessageCount(String user, String contact, String operator, int value, Handler<AsyncResult<Void>> asyncResultHandler) {
+    private void updateUnreadMessageCount(String user, String contact, String operator, int value, Handler<AsyncResult<MongoClientUpdateResult>> asyncResultHandler) {
         JsonObject query = new JsonObject()
                 .put(DbIdentifier.USER_NAME_FLD.get(), user)
                 .put(DbIdentifier.USER_CONTACTS_MAP.get() + "." + DbIdentifier.USER_CONTACTS_NAME_FLD.get(), contact);
         JsonObject update = new JsonObject().put(operator, new JsonObject()
                 .put(DbIdentifier.USER_CONTACTS_MAP.get() + ".$." + DbIdentifier.USER_CONTACTS_UNREADMESSAGES_FLD.get(), value));
 
-        mongoClient.update(DbIdentifier.USER_COL.get(), query, update, asyncResultHandler);
+        mongoClient.updateCollection(DbIdentifier.USER_COL.get(), query, update, asyncResultHandler);
     }
 
-    private void updateOneOrMoreMessagesOfConversationAsRead(String source, String contact, Handler<AsyncResult<Void>> asyncResultHandler, boolean multi) {
+    private void updateMessagesAsRead(String source, String contact, Handler<AsyncResult<MongoClientUpdateResult>> asyncResultHandler, boolean multi) {
         JsonObject query = new JsonObject()
                 .put(DbIdentifier.MESSAGE_READ_FLD.get(), false)
                 .put(DbIdentifier.MESSAGE_SENDER_FLD.get(), contact)
@@ -125,7 +127,7 @@ public class DbOperation {
         JsonObject update = new JsonObject().put("$set", new JsonObject().put(DbIdentifier.MESSAGE_READ_FLD.get(), true));
         UpdateOptions options = new UpdateOptions().setMulti(multi);
 
-        mongoClient.updateWithOptions(DbIdentifier.MESSAGE_COL.get(), query, update, options, asyncResultHandler);
+        mongoClient.updateCollectionWithOptions(DbIdentifier.MESSAGE_COL.get(), query, update, options, asyncResultHandler);
     }
 
     /**

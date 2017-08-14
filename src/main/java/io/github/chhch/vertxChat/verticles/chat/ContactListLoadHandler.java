@@ -16,7 +16,7 @@ class ContactListLoadHandler implements Handler<Message<JsonObject>> {
     private final DbOperation dbOperation;
     private final EventBus eventBus;
 
-    public ContactListLoadHandler(DbOperation dbOperation, EventBus eventBus) {
+    ContactListLoadHandler(DbOperation dbOperation, EventBus eventBus) {
         this.dbOperation = dbOperation;
         this.eventBus = eventBus;
     }
@@ -25,7 +25,7 @@ class ContactListLoadHandler implements Handler<Message<JsonObject>> {
     public void handle(Message<JsonObject> message) {
         String source = message.headers().get(JsonKeys.SOURCE.get());
 
-        dbOperation.findUsersContactList(source, result -> {
+        dbOperation.findContactList(source, result -> {
             if (result.succeeded()) {
                 message.reply(result.result());
             } else {

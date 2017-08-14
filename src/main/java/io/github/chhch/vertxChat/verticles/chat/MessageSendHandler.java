@@ -1,13 +1,12 @@
 package io.github.chhch.vertxChat.verticles.chat;
 
-import io.github.chhch.vertxChat.util.I18n;
 import io.github.chhch.vertxChat.persistence.DbOperation;
+import io.github.chhch.vertxChat.util.I18n;
 import io.github.chhch.vertxChat.verticles.enums.EventBusAddresses;
 import io.github.chhch.vertxChat.verticles.enums.JsonKeys;
 import io.vertx.core.Handler;
 import io.vertx.core.eventbus.EventBus;
 import io.vertx.core.eventbus.Message;
-import io.vertx.core.json.JsonArray;
 import io.vertx.core.json.JsonObject;
 
 import java.time.ZonedDateTime;
@@ -21,7 +20,7 @@ class MessageSendHandler implements Handler<Message<JsonObject>> {
     private final DbOperation dbOperation;
     private final EventBus eventBus;
 
-    public MessageSendHandler(DbOperation dbOperation, EventBus eventBus) {
+    MessageSendHandler(DbOperation dbOperation, EventBus eventBus) {
         this.dbOperation = dbOperation;
         this.eventBus = eventBus;
     }
@@ -30,27 +29,16 @@ class MessageSendHandler implements Handler<Message<JsonObject>> {
     public void handle(Message<JsonObject> bridgeMessage) {
         String sender = bridgeMessage.headers().get(JsonKeys.SOURCE.get());
         String receiver = bridgeMessage.body().getString(JsonKeys.RECEIVER.get());
-        JsonArray usernameList = ChatVerticle.getAsJsonArray(sender, receiver);
 
-        dbOperation.countUsersWhichAreRegistered(usernameList, result -> {
-            if (result.succeeded() && result.result() >= usernameList.size()) {
-                dbOperation.findUserWithContactInTheirList(sender, receiver, user -> {
-                    if (user.succeeded() && !user.result().isEmpty()) {
-                        persistAndSendMessage(bridgeMessage);
-                    } else {
-                        JsonObject messageSendFailedReceiverIsNotAContact = ChatVerticle.getStatusMessage(
-                                JsonKeys.Status.DANGER.get(),
-                                I18n.getString("messageSendFailedReceiverIsNotAContact")
-                        );
-                        bridgeMessage.reply(messageSendFailedReceiverIsNotAContact);
-                    }
-                });
+        dbOperation.findContact(sender, receiver, foundContact -> {
+            if (foundContact.succeeded() && foundContact.result() != null) {
+                persistAndSendMessage(bridgeMessage);
             } else {
-                JsonObject messageSendFailedNoContactSelected = ChatVerticle.getStatusMessage(
-                        JsonKeys.Status.INFO.get(),
-                        I18n.getString("messageSendFailedNoContactSelected")
+                JsonObject messageSendFailedReceiverIsNotAContact = ChatVerticle.getStatusMessage(
+                        JsonKeys.Status.DANGER.get(),
+                        I18n.getString("messageSendFailedReceiverIsNotAContact")
                 );
-                bridgeMessage.reply(messageSendFailedNoContactSelected);
+                bridgeMessage.reply(messageSendFailedReceiverIsNotAContact);
             }
         });
     }
