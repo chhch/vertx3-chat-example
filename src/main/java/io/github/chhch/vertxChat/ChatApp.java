@@ -24,19 +24,21 @@ public class ChatApp {
         if (USE_EMBEDDED_MONGO_DB) {
             deployEmbeddedMongoDB(embeddedMongo);
         } else {
-            embeddedMongo.fail("use another one");
+            embeddedMongo.complete("use another one");
         }
 
-        embeddedMongo.setHandler(res -> {
-            if (res.succeeded()) {
-                System.out.println("Embedded MongoDB Verticle deployed");
+        embeddedMongo.setHandler(result -> {
+            if (result.succeeded()) {
+                String message = USE_EMBEDDED_MONGO_DB ? "Embedded MongoDB Verticle deployed"
+                                                       : "Embedded MongoDB Verticle not deployed (use another one)";
+                System.out.println(message);
+                deployVerticles(chat, web);
             } else {
-                System.out.println("Embedded MongoDB Verticle not deployed (" + res.cause().getMessage() + ")");
+                System.out.println("ERROR: Embedded MongoDB Verticle deployment failed!");
             }
-            deployVerticles(chat, web);
         });
 
-        CompositeFuture.join(web, chat).setHandler(ar -> {
+        CompositeFuture.join(chat, web).setHandler(result -> {
             if (chat.succeeded()) {
                 System.out.println("ChatVerticle successfully deployed");
             } else {
@@ -49,7 +51,7 @@ public class ChatApp {
                 System.out.println("ERROR: WebsiteVerticle deployment failed!");
             }
 
-            if(chat.succeeded() && web.succeeded()) {
+            if (chat.succeeded() && web.succeeded()) {
                 System.out.println("Visit: http://localhost:8080");
             }
         });
