@@ -13,7 +13,6 @@ import io.vertx.core.json.JsonObject;
 import java.util.List;
 
 /**
-/**
  * Created by ch on 07.09.2015.
  */
 class MessagesLoadHandler implements Handler<Message<JsonObject>> {

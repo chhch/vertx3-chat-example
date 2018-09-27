@@ -18,7 +18,7 @@ public class ChatVerticle extends AbstractVerticle {
     }
 
     @Override
-    public void start() throws Exception {
+    public void start() {
         EventBus eventBus = vertx.eventBus();
         MongoClient mongoClient = MongoClient.createShared(vertx, new JsonObject());
         DbOperation dbOperation = new DbOperation(mongoClient);

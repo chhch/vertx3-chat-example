@@ -15,7 +15,7 @@ define(['jquery', 'knockout', 'conversation/messageModel', 'alert/alertModel', '
 
             self.isLoading = ko.observable(false);
 
-            self.conversation = ko.observableArray();
+            self.conversation = ko.observableArray(); // TODO: Rename messages
 
             var timer = setInterval(function () {
                 self.conversation().forEach(function (message) {
@@ -24,7 +24,7 @@ define(['jquery', 'knockout', 'conversation/messageModel', 'alert/alertModel', '
             }, 60 * 1000);
 
             self.scrolledItem = ko.observable();
-            self.force = ko.observable(false);
+            self.force = ko.observable(false); // TODO: Remove?
 
             self.selectedContact = ko.observable();
             postbox.subscribe(function (newValue) {
@@ -59,7 +59,7 @@ define(['jquery', 'knockout', 'conversation/messageModel', 'alert/alertModel', '
                         return (currentValue.sender() === self.selectedContact()) || (currentValue.receiver() === self.selectedContact()) ? currentValue : previousValue;
                     });
                 }
-                self.scrolledItem(message); // test
+                self.scrolledItem(message); // TODO: Remove?
             };
 
             self.newMessage = ko.observable();
@@ -73,7 +73,7 @@ define(['jquery', 'knockout', 'conversation/messageModel', 'alert/alertModel', '
                 if (reply.status === "success") {
                     var message = new Message(reply.sender, self.selectedContact(), reply.message, reply.read, reply.date);
                     self.conversation.push(message);
-                    self.scrolledItem(message); // test
+                    self.scrolledItem(message); // TODO: Remove?
                     self.newMessage('');
                 } else {
                     postbox.notifySubscribers(new Alert(reply.status, reply.statusMessage), "alertToPublish");
@@ -83,12 +83,12 @@ define(['jquery', 'knockout', 'conversation/messageModel', 'alert/alertModel', '
 
             self.handleReceivedMessage = function (messageJson) {
                 var sender = messageJson.sender;
-                if (self.selectedContact() != sender) {
+                if (self.selectedContact() !== sender) {
                     postbox.notifySubscribers(sender, "incrementUnreadMessageCount");
                 } else {
                     var message = new Message(messageJson.sender, self.selectedContact(), messageJson.message, messageJson.read, messageJson.date);
                     self.conversation.push(message);
-                    self.scrolledItem(message); // test
+                    self.scrolledItem(message); // TODO: Remove?
                     self.eventBus.send(self.addressSendReadNotification, {"sender": sender});
                 }
             };

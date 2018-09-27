@@ -10,7 +10,7 @@ import io.vertx.ext.embeddedmongo.EmbeddedMongoVerticle;
  * Created by ch on 31.08.2015.
  */
 public class ChatApp {
-    private static final boolean USE_EMBEDDED_MONGO_DB = false;
+    private static final boolean USE_EMBEDDED_MONGO_DB = true;
     private static final int EMBEDDED_MONGO_DB_PORT = 27017;
     private static Vertx vertx;
 
